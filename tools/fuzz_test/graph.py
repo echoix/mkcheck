@@ -7,7 +7,6 @@ import json
 from collections import defaultdict
 
 
-
 class DependencyGraph(object):
     """Graph describing dependencies between file paths."""
 
@@ -32,6 +31,7 @@ class DependencyGraph(object):
 
     def find_deps(self, src):
         deps = set()
+
         def traverse(name):
             if name in deps:
                 return
@@ -39,6 +39,7 @@ class DependencyGraph(object):
             if name in self.nodes:
                 for edge in self.nodes[name].edges:
                     traverse(edge)
+
         traverse(src)
         return deps
 
@@ -58,6 +59,7 @@ class DependencyGraph(object):
 
         topo = []
         visited = set()
+
         def topo_dfs(node):
             if node in visited:
                 return
@@ -67,9 +69,9 @@ class DependencyGraph(object):
                 topo_dfs(next)
             topo.append(node)
 
-        for node in self.nodes.keys():
+        for node in list(self.nodes.keys()):
             topo_dfs(node)
-    
+
         return reversed(topo)
 
 
@@ -81,72 +83,73 @@ def parse_graph(path):
     inputs = set()
     outputs = set()
     built_by = {}
-    with open(path, 'r') as f:
+    with open(path, "r") as f:
         data = json.loads(f.read())
         for file in data["files"]:
-            files[file['id']] = file
+            files[file["id"]] = file
         for proc in data["procs"]:
-            proc_in = set(proc.get('input', []))
-            proc_out = set(proc.get('output', []))
-            
+            proc_in = set(proc.get("input", []))
+            proc_out = set(proc.get("output", []))
+
             inputs = inputs | proc_in
             outputs = outputs | proc_out
-            image = os.path.basename(files[proc['image']]['name'])
+            image = os.path.basename(files[proc["image"]]["name"])
             for output in proc_out:
-                built_by[files[output]['name']] = image
-    
+                built_by[files[output]["name"]] = image
+
     def persisted(uid):
-        if files[uid].get('deleted', False):
+        if files[uid].get("deleted", False):
             return False
-        if not files[uid].get('exists', False):
+        if not files[uid].get("exists", False):
             return False
-        name = files[uid]['name']
-        if name.startswith('/dev') or name.startswith('/proc'):
+        name = files[uid]["name"]
+        if name.startswith("/dev") or name.startswith("/proc"):
             return False
         return os.path.exists(name) and not os.path.isdir(name)
 
-    inputs = {files[uid]['name'] for uid in inputs if persisted(uid)}
-    outputs = {files[uid]['name'] for uid in outputs if persisted(uid)}
+    inputs = {files[uid]["name"] for uid in inputs if persisted(uid)}
+    outputs = {files[uid]["name"] for uid in outputs if persisted(uid)}
 
     gid = {}
     for proc in sorted(data["procs"], key=lambda p: p["uid"]):
-      uid = proc["uid"]
-      if proc.get('cow', False) and proc["parent"] in gid:
-        gid[uid] = gid[proc["parent"]]
-      else:
-        gid[uid] = uid
+        uid = proc["uid"]
+        if proc.get("cow", False) and proc["parent"] in gid:
+            gid[uid] = gid[proc["parent"]]
+        else:
+            gid[uid] = uid
 
     groups = defaultdict(lambda: (set(), set()))
     for proc in data["procs"]:
-      group_id = gid[proc["uid"]]
+        group_id = gid[proc["uid"]]
 
-      ins, outs = groups[group_id]
-      ins.update(proc.get('input', []))
-      outs.update(proc.get('output', []))
-   
+        ins, outs = groups[group_id]
+        ins.update(proc.get("input", []))
+        outs.update(proc.get("output", []))
+
     edges = defaultdict(list)
-    for uid, file in files.items():
-        for dep in file.get('deps', []):
-            edges[files[dep]['name']].append(files[uid]['name'])
-   
-    for _, (ins, outs) in groups.items():
+    for uid, file in list(files.items()):
+        for dep in file.get("deps", []):
+            edges[files[dep]["name"]].append(files[uid]["name"])
+
+    for _, (ins, outs) in list(groups.items()):
         for input in ins - outs:
-            if files[input]['name'] in ['/dev/stderr', '/dev/stdout']:
+            if files[input]["name"] in ["/dev/stderr", "/dev/stdout"]:
                 continue
-            if os.path.isdir(files[input]['name']):
+            if os.path.isdir(files[input]["name"]):
                 continue
             for output in outs:
-                if files[output]['name'] in ['/dev/stderr', '/dev/stdout']:
+                if files[output]["name"] in ["/dev/stderr", "/dev/stdout"]:
                     continue
-                if os.path.isdir(files[output]['name']):
+                if os.path.isdir(files[output]["name"]):
                     continue
-                edges[files[input]['name']].append(files[output]['name'])
+                edges[files[input]["name"]].append(files[output]["name"])
 
     nodes = inputs | outputs
 
     graph = DependencyGraph()
     for src in nodes:
         visited = set()
+
         def add_edges(to):
             if to in visited:
                 return
@@ -157,6 +160,7 @@ def parse_graph(path):
                         graph.add_dependency(src, node)
                 else:
                     add_edges(node)
+
         add_edges(src)
 
     return inputs, outputs, built_by, graph

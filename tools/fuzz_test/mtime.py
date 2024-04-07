@@ -5,7 +5,6 @@
 import os
 
 
-
 def read_mtimes(paths):
     mtimes = {}
     for path in paths:
