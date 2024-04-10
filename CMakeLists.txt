@@ -17,6 +17,7 @@ add_executable(mkcheck
     mkcheck/util.cpp
 )
 target_compile_features(mkcheck PUBLIC cxx_std_17)
+set_target_properties(mkcheck PROPERTIES CXX_STANDARD_REQUIRED ON)
 target_link_libraries(mkcheck
   ${Boost_LIBRARIES}
 )
