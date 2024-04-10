@@ -4,6 +4,7 @@
 
 cmake_minimum_required(VERSION 3.5)
 project(mkcheck CXX)
+include(CTest)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
@@ -22,3 +23,6 @@ set_target_properties(mkcheck PROPERTIES CXX_EXTENSIONS OFF)
 target_link_libraries(mkcheck
   ${Boost_LIBRARIES}
 )
+
+add_test(NAME make COMMAND make -C ${PROJECT_SOURCE_DIR}/test/make test)
+
