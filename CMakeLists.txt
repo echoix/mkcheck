@@ -7,7 +7,6 @@ project(mkcheck CXX)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
-add_compile_options(-std=c++17)
 
 add_executable(mkcheck
     mkcheck/fd.cpp
@@ -17,6 +16,7 @@ add_executable(mkcheck
     mkcheck/trace.cpp
     mkcheck/util.cpp
 )
+target_compile_features(mkcheck PUBLIC cxx_std_17)
 target_link_libraries(mkcheck
   ${Boost_LIBRARIES}
 )
