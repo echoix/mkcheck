@@ -25,4 +25,8 @@ target_link_libraries(mkcheck
 )
 
 add_test(NAME make COMMAND make -C ${PROJECT_SOURCE_DIR}/test/make test)
+add_test(NAME parallel COMMAND make -C ${PROJECT_SOURCE_DIR}/test/parallel test)
+
+
+
 
