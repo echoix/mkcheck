@@ -222,6 +222,15 @@ static void sys_fcntl(Process *proc, const Args &args)
 }
 
 // -----------------------------------------------------------------------------
+static void sys_truncate(Process *proc, const Args &args)
+{
+  if (args.Return >= 0) {
+    const fs::path path = proc->Normalise(ReadString(args.PID, args[0]));
+    proc->AddOutput(path);
+  }
+}
+
+// -----------------------------------------------------------------------------
 static void sys_ftruncate(Process *proc, const Args &args)
 {
   if (args.Return >= 0) {
@@ -690,7 +699,7 @@ static const HandlerFn kHandlers[] =
   /* 0x049 */ [SYS_flock             ] = sys_ignore,
   /* 0x04A */ [SYS_fsync             ] = sys_ignore,
   /* 0x04B */ [SYS_fdatasync         ] = sys_ignore,
-  /* 0x04C */ [SYS_truncate          ] = sys_ignore,
+  /* 0x04C */ [SYS_truncate          ] = sys_truncate,
   /* 0x04D */ [SYS_ftruncate         ] = sys_ftruncate,
   /* 0x04E */ [SYS_getdents          ] = sys_getdents,
   /* 0x04F */ [SYS_getcwd            ] = sys_ignore,
