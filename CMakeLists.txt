@@ -24,7 +24,7 @@ target_link_libraries(mkcheck
   ${Boost_LIBRARIES}
 )
 
-add_test(NAME make COMMAND make -C ${PROJECT_SOURCE_DIR}/test/make test)
+add_test(NAME make COMMAND make -C ${PROJECT_SOURCE_DIR}/test/make test MKCHECK=$<TARGET_FILE:mkcheck> TOPDIR=${PROJECT_SOURCE_DIR})
 add_test(NAME parallel COMMAND make -C ${PROJECT_SOURCE_DIR}/test/parallel test MKCHECK=$<TARGET_FILE:mkcheck> TOPDIR=${PROJECT_SOURCE_DIR})
 
 
