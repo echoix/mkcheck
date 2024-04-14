@@ -7,10 +7,10 @@ import json
 from collections import defaultdict
 
 
-class DependencyGraph(object):
+class DependencyGraph():
     """Graph describing dependencies between file paths."""
 
-    class Node(object):
+    class Node():
         def __init__(self, path):
             self.path = path
             self.edges = set()
