@@ -11,3 +11,4 @@ tools/viewer/dist/data
 node_modules
 *.swp
 .watchmanconfig
+.cache/

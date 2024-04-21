@@ -7,7 +7,6 @@ import yaml
 import re
 import resource
 import subprocess
-import stat
 import sys
 import tempfile
 import time
@@ -25,7 +24,7 @@ TOOL_PATH = os.path.join(PROJECT_PATH, "build", "mkcheck")
 DELAY = 1
 
 
-class HashTouchContext(object):
+class HashTouchContext():
     """Context touching a file by adding a dummy extension."""
 
     TEXT_EXT = [
@@ -73,7 +72,7 @@ class HashTouchContext(object):
         self.tmp.close()
 
 
-class TimeTouchContext(object):
+class TimeTouchContext():
     def __init__(self, path):
         self.path = path
 
@@ -87,7 +86,7 @@ class TimeTouchContext(object):
         pass
 
 
-class Project(object):
+class Project():
     """Generic project: automake, cmake, make etc."""
 
     # Based on past information, quite a few files are very
@@ -187,7 +186,7 @@ class Make(Project):
     ]
 
     def __init__(self, root, graph, rule_file, use_hash, args):
-        super(Make, self).__init__(rule_file, use_hash, args)
+        super().__init__(rule_file, use_hash, args)
         self.projectPath = root
         self.buildPath = root
         self.graph = graph
@@ -246,7 +245,7 @@ class SCons(Project):
     FILTER_OUT = [r".*\.internal", r".*\.includecache"]
 
     def __init__(self, root, graph, rule_file, use_hash, args):
-        super(SCons, self).__init__(rule_file, use_hash, args)
+        super().__init__(rule_file, use_hash, args)
         self.projectPath = root
         self.buildPath = root
         self.graph = graph
@@ -279,7 +278,7 @@ class SCons(Project):
     def filter_in(self, f):
         """Decides if the file is relevant to the project."""
 
-        if not super(SCons, self).filter_in(f):
+        if not super().filter_in(f):
             return False
         if not f.startswith(self.projectPath):
             return False
@@ -342,7 +341,7 @@ class CMakeProject(Project):
     ]
 
     def __init__(self, projectPath, buildPath, graph, rule_file, use_hash, args):
-        super(CMakeProject, self).__init__(rule_file, use_hash, args)
+        super().__init__(rule_file, use_hash, args)
         self.projectPath = projectPath
         self.graph = graph
         self.buildPath = buildPath
@@ -378,7 +377,7 @@ class CMakeProject(Project):
     def filter_in(self, f):
         """Decides if the file is relevant to the project."""
 
-        if not super(CMakeProject, self).filter_in(f):
+        if not super().filter_in(f):
             return False
         if self.buildPath != self.projectPath and f.startswith(self.buildPath):
             return False
@@ -389,7 +388,7 @@ class CMakeProject(Project):
     def filter_tmp(self, f):
         """Decides if an internal file is relevant for race detection."""
 
-        if not super(CMakeProject, self).filter_tmp(f):
+        if not super().filter_tmp(f):
             return False
         if not f.startswith(self.projectPath):
             return False

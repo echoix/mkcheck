@@ -7,10 +7,10 @@ import json
 from collections import defaultdict
 
 
-class DependencyGraph(object):
+class DependencyGraph():
     """Graph describing dependencies between file paths."""
 
-    class Node(object):
+    class Node():
         def __init__(self, path):
             self.path = path
             self.edges = set()
@@ -84,15 +84,14 @@ def parse_graph(path):
     outputs = set()
     built_by = {}
     with open(path, "r") as f:
-        data = json.loads(f.read())
+        data = json.load(f)
         for file in data["files"]:
             files[file["id"]] = file
         for proc in data["procs"]:
-            proc_in = set(proc.get("input", []))
             proc_out = set(proc.get("output", []))
 
-            inputs = inputs | proc_in
-            outputs = outputs | proc_out
+            inputs.update(proc.get("input", []))
+            outputs.update(proc_out)
             image = os.path.basename(files[proc["image"]]["name"])
             for output in proc_out:
                 built_by[files[output]["name"]] = image

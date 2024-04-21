@@ -4,6 +4,8 @@
 
 CC = gcc
 OUT = out
+MKCHECK = ../../build/mkcheck
+TOPDIR = ../..
 
 
 .PHONY: dirs clean
@@ -51,9 +53,9 @@ clean :
 
 test :
 	make clean
-	../../build/mkcheck -o /tmp/graph -- make -j1
+	$(MKCHECK) -o /tmp/graph -- make -j1
 	@echo "Fuzzing parallel"
-	python3 ../../tools/fuzz_test --graph-path=/tmp/graph fuzz
+	python3 $(TOPDIR)/tools/fuzz_test --graph-path=/tmp/graph fuzz
 	@echo "Race testing parallel"
-	python3 ../../tools/fuzz_test --graph-path=/tmp/graph race
+	python3 $(TOPDIR)/tools/fuzz_test --graph-path=/tmp/graph race
     
