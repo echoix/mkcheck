@@ -84,7 +84,7 @@ def parse_graph(path):
     outputs = set()
     built_by = {}
     with open(path, "r") as f:
-        data = json.loads(f.read())
+        data = json.load(f)
         for file in data["files"]:
             files[file["id"]] = file
         for proc in data["procs"]:
